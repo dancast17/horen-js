@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  horen:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/workspaces/hören
+      - /workspaces/hören/website/horen-js/node_modules
+    working_dir: /workspaces/hören/website/horen-js
+    command: yarn dev
+    stdin_open: true
+    tty: true

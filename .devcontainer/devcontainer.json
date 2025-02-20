@@ -1,0 +1,13 @@
+{
+  "name": "Next.js DevContainer",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "horen",
+  "workspaceFolder": "/workspaces/hören/website/horen-js",
+  "forwardPorts": [3000],
+  "postCreateCommand": "yarn install",
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-azuretools.vscode-docker"
+  ]
+}

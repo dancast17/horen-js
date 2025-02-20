@@ -1,0 +1,7 @@
+node_modules
+.next
+out
+yarn-error.log
+.DS_Store
+.env
+docker build -t horen-app .
