@@ -25,7 +25,11 @@ module.exports = {
       backgroundSize: {
         '200%': '200% 200%', // Adjusted size to 200%
       },
+      backgroundColor: {
+        'black-1000': '#000000', // Ensure this is correct
+      },
     },
+    
   },
   plugins: [],
 };

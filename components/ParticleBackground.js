@@ -1,10 +1,8 @@
-"use client";
-
 import { useEffect, useRef } from "react";
 
 const ParticleBackground = () => {
   const canvasRef = useRef(null);
-  let particles = [];
+  const parallaxRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -13,18 +11,16 @@ const ParticleBackground = () => {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    const colors = [ "#84B7DC", "#D7799C", "#F69686", "#CF94B6"];
+    const colors = ["#FF0000", "#fd0c0c", "#660000", "#001F3F"]; // Deep red and dark blue for contrast
 
     class Particle {
       constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.vx = (Math.random() - 0.5) * 2;
-        this.vy = (Math.random() - 0.5) * 2;
-        this.initialVx = this.vx;
-        this.initialVy = this.vy;
-        this.size = Math.random() * 100 + 50;
-        this.opacity = Math.random() * 0.4 + 0.3;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.5;
+        this.size = Math.random() * 180 + 80;
+        this.opacity = Math.random() * 0.5 + 0.2;
         this.color = colors[Math.floor(Math.random() * colors.length)];
       }
 
@@ -32,81 +28,74 @@ const ParticleBackground = () => {
         this.x += this.vx;
         this.y += this.vy;
 
-        // **Soft Border Handling**: Instead of bouncing, gently push them back
-        const margin = 50; // Allow some margin before pushing back
-
-        if (this.x < margin) this.vx += (margin - this.x) * 0.01;
-        if (this.x > width - margin) this.vx -= (this.x - (width - margin)) * 0.01;
-        if (this.y < margin) this.vy += (margin - this.y) * 0.01;
-        if (this.y > height - margin) this.vy -= (this.y - (height - margin)) * 0.01;
-
-        // **Slow down gradually, return to initial speed**
-        this.vx += (this.initialVx - this.vx) * 0.02;
-        this.vy += (this.initialVy - this.vy) * 0.02;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
       }
 
       draw() {
         ctx.beginPath();
         ctx.fillStyle = this.color;
         ctx.globalAlpha = this.opacity;
-        ctx.filter = "blur(40px)";
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.filter = "blur(60px)"; // Stronger blur for fog effect
+        ctx.arc(
+          this.x + parallaxRef.current.x, 
+          this.y + parallaxRef.current.y, 
+          this.size, 0, Math.PI * 2
+        );
         ctx.fill();
         ctx.globalAlpha = 1;
         ctx.filter = "none";
       }
-    }
 
-    function initParticles() {
-      particles = [];
-      for (let i = 0; i < 10; i++) {
-        particles.push(new Particle(Math.random() * width, Math.random() * height));
+      reactToMouse(mouseX, mouseY) {
+        const dx = this.x - mouseX;
+        const dy = this.y - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < this.size * 0.8) {
+          // Push particle away smoothly
+          const force = Math.max(0, 1 - distance / (this.size * 0.8));
+          this.vx += dx * 0.05 * force;
+          this.vy += dy * 0.05 * force;
+        }
       }
     }
 
+    let particles = Array.from({ length: 15 }, () => 
+      new Particle(Math.random() * width, Math.random() * height)
+    );
+
     function animate() {
       ctx.clearRect(0, 0, width, height);
-
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw();
+      particles.forEach(p => {
+        p.update();
+        p.draw();
       });
-
       requestAnimationFrame(animate);
     }
 
     function resizeCanvas() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-      initParticles();
     }
 
-    function mouseMove(e) {
-      particles.forEach((particle) => {
-        const dx = particle.x - e.clientX;
-        const dy = particle.y - e.clientY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+    function handleMouseMove(e) {
+      const moveX = (e.clientX / width - 0.5) * 50; 
+      const moveY = (e.clientY / height - 0.5) * 50;
+      parallaxRef.current = { x: moveX, y: moveY };
 
-        if (distance < 150) {
-          // **Smooth repel effect based on proximity**
-          const force = Math.max(0, 1 - distance / 150);
-          const speedBoost = force * 2;
-
-          particle.vx += (dx * 0.05) * speedBoost;
-          particle.vy += (dy * 0.05) * speedBoost;
-        }
-      });
+      // Make particles react to mouse
+      particles.forEach(p => p.reactToMouse(e.clientX, e.clientY));
     }
 
     window.addEventListener("resize", resizeCanvas);
-    window.addEventListener("mousemove", mouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
 
-    resizeCanvas();
     animate();
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);
-      window.removeEventListener("mousemove", mouseMove);
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
