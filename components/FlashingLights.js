@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 
 const FlashingLights = ({ titleRef }) => {
   const canvasRef = useRef(null);
-  const [lights, setLights] = useState([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -12,7 +12,7 @@ const FlashingLights = ({ titleRef }) => {
     let height = (canvas.height = window.innerHeight);
 
     const colors = ["#FF0000", "#fd0c0c", "#cc0000", "#660000"];
-    
+
     let titleSize = 200; // Default size before measuring title
 
     if (titleRef?.current) {
@@ -69,41 +69,21 @@ const FlashingLights = ({ titleRef }) => {
       requestAnimationFrame(drawLights);
     }
 
-    function handleMouseMove(e) {
-      flashingLights.forEach((light) => {
-        const dx = e.clientX - light.x;
-        const dy = e.clientY - light.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < light.size) {
-          light.isHovered = true;
-          light.opacity = Math.random() * 0.5 + 0.5; // Blinking when hovered
-        } else {
-          light.isHovered = false;
-          light.opacity = 0.8; // Keep steady otherwise
-        }
-      });
-
-      setLights([...flashingLights]);
-    }
-
-    function resizeCanvas() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-    window.addEventListener("mousemove", handleMouseMove);
-
     drawLights();
-
-    return () => {
-      window.removeEventListener("resize", resizeCanvas);
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
   }, [titleRef]);
 
   return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-5" />;
 };
+
+FlashingLights.propTypes = {
+  titleRef: PropTypes.shape({
+    current: PropTypes.object,
+  }),
+};
+
+FlashingLights.defaultProps = {
+  titleRef: null,
+};
+
 
 export default FlashingLights;

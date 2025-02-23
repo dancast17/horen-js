@@ -53,7 +53,7 @@ const ContactForm = () => {
           transition={{ duration: 0.5 }}
           className="text-green-400 text-center"
         >
-          ✅ Thank you! We'll be in touch.
+           Thank you! We&apos;ll be in touch.
         </motion.p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">

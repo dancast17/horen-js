@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+
 const ParticleBackground = () => {
   const canvasRef = useRef(null);
   const parallaxRef = useRef({ x: 0, y: 0 });

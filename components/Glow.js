@@ -1,10 +1,21 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import PropTypes from "prop-types";
+
+const FlashingLights = ({ titleRef }) => {
+  return <div>{titleRef?.current?.textContent}</div>;
+};
+
+FlashingLights.propTypes = {
+  titleRef: PropTypes.object,
+};
+
+FlashingLights.defaultProps = {
+  titleRef: null,
+};
 
 const HoverGlow = ({ titleRef }) => {
   const canvasRef = useRef(null);
   const [glowPosition, setGlowPosition] = useState({ x: 0, y: 0, width: 0, height: 0 });
-
-  const colors = ["#FF0000", "#fd0c0c", "#cc0000", "#660000"];
 
   const updateTitlePosition = useCallback(() => {
     if (titleRef?.current) {
@@ -33,6 +44,8 @@ const HoverGlow = ({ titleRef }) => {
 
     let colorIndex = 0;
     let transitionFactor = 0;
+    // Moved colors inside the useEffect so it won't change on every render.
+    const colors = ["#FF0000", "#fd0c0c", "#cc0000", "#660000"];
 
     function interpolateColor(color1, color2, factor) {
       let c1 = parseInt(color1.slice(1), 16),
@@ -98,6 +111,15 @@ const HoverGlow = ({ titleRef }) => {
   }, [glowPosition]);
 
   return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full pointer-events-none mix-blend-lighten z-10" />;
+};
+
+HoverGlow.propTypes = {
+  titleRef: PropTypes.object,
+};
+
+
+HoverGlow.defaultProps = {
+  titleRef: null,
 };
 
 export default HoverGlow;
