@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const FlashingLights = ({ titleRef }) => {
   const canvasRef = useRef(null);
-  const [lights, setLights] = useState([]);
+  const [setLights] = useState([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
