@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 const FlashingLights = ({ titleRef }) => {
   const canvasRef = useRef(null);
-  const [setLights] = useState([]);
+  const [lights, setLights] = useState([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,13 +50,13 @@ const FlashingLights = ({ titleRef }) => {
       return newLights;
     }
 
-    let flashingLights = generateLights(6);
-    setLights(flashingLights);
+    const newLights = generateLights(6);
+    setLights(newLights);
 
     function drawLights() {
       ctx.clearRect(0, 0, width, height);
 
-      flashingLights.forEach((light) => {
+      lights.forEach((light) => {
         ctx.beginPath();
         ctx.fillStyle = light.color;
         ctx.globalAlpha = light.opacity;
@@ -71,7 +71,7 @@ const FlashingLights = ({ titleRef }) => {
     }
 
     drawLights();
-  }, [titleRef]);
+  }, [titleRef, lights]);
 
   return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-5" />;
 };
